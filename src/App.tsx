@@ -89,10 +89,7 @@ function LandingPage() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-24 flex flex-col items-center justify-center text-center">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm px-4 py-1.5 rounded-full mb-6">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              Built for NNPC Ltd operations
-            </div>
+          
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white leading-[1.1] mb-6">
               Smarter inventory control<br />
               across every <span className="text-emerald-400">refinery, depot & rig</span>

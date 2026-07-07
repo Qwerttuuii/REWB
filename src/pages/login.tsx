@@ -45,7 +45,7 @@ export default function LoginPage() {
     return;
   }
 
-  alert("✅ Login Successful!");
+  alert(" Login Successful!");
 
   if (profile.role === "admin") {
     navigate("/admin");
