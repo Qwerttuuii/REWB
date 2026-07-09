@@ -36,20 +36,20 @@ export default function AdminTransactions() {
 
   async function fetchTransactions() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("transactions")
-      .select(`
-        *,
-        inventory_items:item_id (
-          item_name,
-          sku
-        ),
-        profiles!transactions_created_by_fkey (
-          full_name,
-          role
-        )
-      `)
-      .order("created_at", { ascending: false });
+  const { data, error } = await supabase
+  .from("transactions")
+  .select(`
+    *,
+    inventory_items:item_id (
+      item_name,
+      sku
+    ),
+    profiles!transactions_created_by_profiles_fkey (
+      full_name,
+      role
+    )
+  `)
+  .order("created_at", { ascending: false });
 
     if (error) {
       console.error(error);

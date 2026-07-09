@@ -226,6 +226,76 @@ export default function Dashboard() {
     }
   };
 
+  // Escapes a value for safe placement inside a CSV cell
+  const escapeCSV = (value: any) => {
+    const str = value === null || value === undefined ? '' : String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const handleExportReport = () => {
+    const rows: string[] = [];
+
+    // --- Summary section ---
+    rows.push('OPERATIONS DASHBOARD REPORT');
+    rows.push(`Generated,${new Date().toLocaleString()}`);
+    rows.push('');
+    rows.push('SUMMARY');
+    rows.push('Metric,Value');
+    rows.push(`Total Items,${stats.totalItems}`);
+    rows.push(`Inventory Value,${stats.inventoryValue}`);
+    rows.push(`Low Stock Items,${stats.lowStock}`);
+    rows.push(`Out of Stock Items,${stats.outOfStock}`);
+    rows.push(`Warehouses,${stats.warehouses}`);
+    rows.push('');
+
+    // --- Full inventory section ---
+    rows.push('INVENTORY ITEMS');
+    rows.push('SKU,Item Name,Warehouse,Stock,Reorder Point,Unit Price,Unit of Measure,Supplier');
+    items.forEach((item) => {
+      rows.push([
+        escapeCSV(item.sku),
+        escapeCSV(item.item_name),
+        escapeCSV(item.warehouse),
+        escapeCSV(item.stock),
+        escapeCSV(item.rop),
+        escapeCSV(item.unit_price),
+        escapeCSV(item.unit_of_measure),
+        escapeCSV(item.supplier),
+      ].join(','));
+    });
+    rows.push('');
+
+    // --- Recent transactions section ---
+    rows.push('RECENT TRANSACTIONS');
+    rows.push('Reference,Type,Item,SKU,Quantity,Warehouse,Date');
+    recentTransactions.forEach((t) => {
+      rows.push([
+        escapeCSV(t.reference),
+        escapeCSV(t.transaction_type),
+        escapeCSV(t.inventory_items?.item_name),
+        escapeCSV(t.inventory_items?.sku),
+        escapeCSV(t.quantity),
+        escapeCSV(t.warehouse),
+        escapeCSV(new Date(t.created_at).toLocaleString()),
+      ].join(','));
+    });
+
+    const csvContent = rows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `operations-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
@@ -237,7 +307,7 @@ export default function Dashboard() {
   return (
     <div className="bg-slate-50 min-h-screen p-4 sm:p-6 lg:p-8">
 
-      <DashboardHeader />
+      <DashboardHeader onExportReport={handleExportReport} />
 
       <KPISection
         totalItems={stats.totalItems}

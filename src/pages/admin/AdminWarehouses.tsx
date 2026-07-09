@@ -73,19 +73,19 @@ export default function AdminWarehouses() {
       .from("inventory_items")
       .select("warehouse, stock, unit_price");
 
-    const enriched = warehouseData.map((wh) => {
-      const items = (inventory || []).filter(
-        (i) => i.warehouse === wh.warehouse_code
-      );
-      return {
-        ...wh,
-        skuCount: items.length,
-        inventoryValue: items.reduce(
-          (sum, i) => sum + (i.stock || 0) * Number(i.unit_price || 0),
-          0
-        ),
-      };
-    });
+  const enriched = warehouseData.map((wh) => {
+  const items = (inventory || []).filter(
+    (i) => i.warehouse === wh.warehouse_name
+  );
+  return {
+    ...wh,
+    skuCount: items.length,
+    inventoryValue: items.reduce(
+      (sum, i) => sum + (i.stock || 0) * Number(i.unit_price || 0),
+      0
+    ),
+  };
+});
 
     setWarehouses(enriched);
     setStats({
