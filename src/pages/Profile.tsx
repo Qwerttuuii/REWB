@@ -1,4 +1,3 @@
-
 import { User, Activity, FileText, PackageCheck, AlertTriangle, Clock,  CheckCircle2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
@@ -6,13 +5,13 @@ export default function Profile() {
  
 
 const [userProfile, setUserProfile] = useState<any>(null);
+const [lastLogin, setLastLogin] = useState<string>('—');
 const [loading, setLoading] = useState(true);
 
   const activity = {
     transactionsRecorded: 0,
     itemsAdded: 6,
     alertsFlagged: 3,
-    lastLogin: '19 Jun 2026, 08:42 WAT',
   };
   useEffect(() => {
   fetchProfile();
@@ -35,6 +34,18 @@ const fetchProfile = async () => {
     if (error) throw error;
 
     setUserProfile(data);
+
+    // Format the real last sign-in time from Supabase Auth
+    if (user.last_sign_in_at) {
+      const formatted = new Date(user.last_sign_in_at).toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      setLastLogin(formatted);
+    }
   } catch (error) {
     console.error('Error fetching profile:', error);
   } finally {
@@ -174,7 +185,7 @@ if (loading) {
                     <Clock className="w-4 h-4 text-emerald-600" />
                   </div>
                 </div>
-                <p className="text-lg font-bold text-gray-900 mt-3 leading-tight">{activity.lastLogin}</p>
+                <p className="text-lg font-bold text-gray-900 mt-3 leading-tight">{lastLogin}</p>
               </div>
             </div>
           </div>
