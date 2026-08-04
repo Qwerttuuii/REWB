@@ -19,7 +19,27 @@ export default function ProtectedRoute({
       data: { user },
     } = await supabase.auth.getUser();
 
-    setAuthenticated(!!user);
+    if (!user) {
+      setAuthenticated(false);
+      setLoading(false);
+      return;
+    }
+
+    // Re-check account status on every protected page load
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || profile?.status === "Inactive") {
+      await supabase.auth.signOut();
+      setAuthenticated(false);
+      setLoading(false);
+      return;
+    }
+
+    setAuthenticated(true);
     setLoading(false);
   };
 

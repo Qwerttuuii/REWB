@@ -32,15 +32,23 @@ export default function LoginPage() {
   // Logged in user
   const user = data.user;
 
-  // Get role from profiles table
+  // Get role and status from profiles table
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, status")
     .eq("id", user.id)
     .single();
 
   if (profileError) {
     alert("Unable to fetch user profile.");
+    setIsLoading(false);
+    return;
+  }
+
+  // Block deactivated accounts
+  if (profile.status === "Inactive") {
+    await supabase.auth.signOut();
+    alert("This account has been deactivated. Please contact an administrator.");
     setIsLoading(false);
     return;
   }
